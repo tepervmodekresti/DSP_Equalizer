@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="180" prefWidth="360"
+<AnchorPane id="AnchorPane" prefHeight="210" prefWidth="360"
             xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="GUI.FXMLDocumentController">
     <children>
@@ -18,6 +18,8 @@
         <Button fx:id="button_play" layoutX="70" layoutY="120.0" onAction="#play" prefHeight="40.0" prefWidth="60.0"/>
         <Button fx:id="button_pause" layoutX="150" layoutY="120.0" onAction="#pause" prefHeight="40.0" prefWidth="60.0"/>
         <Button fx:id="button_stop" layoutX="230" layoutY="120.0" onAction="#stop" prefHeight="40.0" prefWidth="60.0"/>
+
+        <CheckBox layoutX="130" layoutY="175.0" onAction="#filterBox" text="ФНЧ КИХ" textFill="#fefefe" />
 
     </children>
 </AnchorPane>
