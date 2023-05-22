@@ -1,28 +1,28 @@
 package player;
 
-import equalizer.Filter;
-
+import equalizer.Equalizer;
 import javax.sound.sampled.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.concurrent.ExecutionException;
 
 public class AudioPlayer {
+    private final File currentMusicFile;
+    private AudioInputStream audioStream;
     private SourceDataLine sourceDataLine;
     public static final int BUFF_SIZE = 32000;
-    private final byte[] bufferBytes  = new byte[BUFF_SIZE];
+    private final byte[] bufferBytes = new byte[BUFF_SIZE];
     private short[] bufferShort = new short[BUFF_SIZE / 2];
-    private final Filter filter;
-    private boolean isFilter;
-    private AudioInputStream audioStream;
     private boolean pauseStatus;
-    private final File currentMusicFile;
     private boolean stopStatus;
+    private double gain;
+    private final Equalizer equalizer;
 
     public AudioPlayer(File musicFile) {
         this.currentMusicFile = musicFile;
-        this.filter = new Filter();
-        this.isFilter = false;
+        this.equalizer = new Equalizer();
+        this.gain = 1.0;
     }
 
 
@@ -37,19 +37,24 @@ public class AudioPlayer {
             this.stopStatus = false;
 
             while ((this.audioStream.read(this.bufferBytes) != -1)) {
-                this.ByteArrayToSamplesArray();
-                if (this.pauseStatus)
-                    this.pause();
-                if (this.stopStatus)
-                    break;
-                if(this.isFilter)
-                    this.bufferShort = this.filter.filtering(this.bufferShort);
-                this.SampleArrayToByteArray();
+                this.ByteArrayToShortArray();
+
+                if (this.pauseStatus) this.pause();
+
+                if (this.stopStatus) break;
+
+                equalizer.setInputSignal(this.bufferShort);
+                this.equalizer.equalization();
+                this.bufferShort = equalizer.getOutputSignal();
+
+                this.ShortArrayToByteArray();
                 this.sourceDataLine.write(this.bufferBytes, 0, this.bufferBytes.length);
             }
             this.sourceDataLine.drain();
             this.sourceDataLine.close();
-        } catch (IOException | LineUnavailableException | UnsupportedAudioFileException e) {
+        } catch (IOException | LineUnavailableException | UnsupportedAudioFileException | ExecutionException |
+                 InterruptedException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -78,35 +83,32 @@ public class AudioPlayer {
     }
 
     public void close() {
-        if (this.audioStream != null)
-            try {
-                this.audioStream.close();
-            } catch (IOException e) {
-            }
-        if (this.sourceDataLine != null)
-            this.sourceDataLine.close();
+        if (this.audioStream != null) try {
+            this.audioStream.close();
+        } catch (IOException e) {
+        }
+        if (this.sourceDataLine != null) this.sourceDataLine.close();
     }
 
-    private void ByteArrayToSamplesArray() {
+    private void ByteArrayToShortArray() {
         for (int i = 0, j = 0; i < this.bufferBytes.length; i += 2, j++) {
-            this.bufferShort[j] = (short) ((ByteBuffer.wrap(this.bufferBytes, i, 2).order(
-                    java.nio.ByteOrder.LITTLE_ENDIAN).getShort() / 2));
+            this.bufferShort[j] = (short) ((ByteBuffer.wrap(this.bufferBytes, i, 2).order(java.nio.ByteOrder.LITTLE_ENDIAN).getShort() / 2) * this.gain);
         }
     }
 
-    private void SampleArrayToByteArray() {
+    private void ShortArrayToByteArray() {
         for (int i = 0, j = 0; i < this.bufferShort.length && j < this.bufferBytes.length; i++, j += 2) {
             this.bufferBytes[j] = (byte) (this.bufferShort[i]);
             this.bufferBytes[j + 1] = (byte) (this.bufferShort[i] >>> 8);
         }
     }
 
-    public boolean filterIsActive() {
-        return this.isFilter;
+    public void setGain(double gain) {
+        this.gain = gain;
     }
 
-    public void setFilter(boolean b) {
-        this.isFilter = b;
+    public Equalizer getEqualizer() {
+        return this.equalizer;
     }
 
 }
