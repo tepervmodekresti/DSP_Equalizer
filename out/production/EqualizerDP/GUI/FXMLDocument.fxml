@@ -19,7 +19,7 @@
         <Button fx:id="button_pause" layoutX="150" layoutY="120.0" onAction="#pause" prefHeight="40.0" prefWidth="60.0"/>
         <Button fx:id="button_stop" layoutX="230" layoutY="120.0" onAction="#stop" prefHeight="40.0" prefWidth="60.0"/>
 
-        <CheckBox layoutX="130" layoutY="175.0" onAction="#filterBox" text="ПФ КИХ" textFill="#fefefe" />
+        <CheckBox layoutX="130" layoutY="175.0" onAction="#filterBox" text="ПФ БИХ" textFill="#fefefe" />
 
     </children>
 </AnchorPane>
