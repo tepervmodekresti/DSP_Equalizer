@@ -72,7 +72,7 @@ public class FXMLDocumentController {
 
     @FXML
     private void filterBox() {
-        System.out.println("IIR HPF");
+        System.out.println("FIR BP");
         if(!this.audioPlayer.filterIsActive())
             this.audioPlayer.setFilter(true);
         else this.audioPlayer.setFilter(false);
