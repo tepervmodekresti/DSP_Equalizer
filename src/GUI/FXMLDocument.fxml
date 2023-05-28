@@ -71,5 +71,9 @@
                 prefHeight="25.0" prefWidth="155.0" rotate="0" value="0.5">
         </Slider>
 
+        <Label layoutX="650" layoutY="300" text="Панель эффектов" textFill="#fefefe"/>
+        <CheckBox layoutX="650.0" layoutY="332.0" onAction="#chorusBox" text="Chorus" textFill="#fefefe"/>
+        <CheckBox layoutX="650.0" layoutY="372.0" onAction="#vibratoBox" text="Vibrato" textFill="#fefefe"/>
+
     </children>
 </AnchorPane>
